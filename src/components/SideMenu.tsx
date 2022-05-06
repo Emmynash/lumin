@@ -1,0 +1,63 @@
+import React from 'react';
+import { createStyles, makeStyles, Paper, Divider } from "@material-ui/core";
+import { useSideBarContext } from "hooks";
+import { SideMenuHeader } from "components";
+import { useSwipeable } from "react-swipeable";
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    container: {
+      flex: '0 0 auto',
+      overflowY: 'auto',
+      zIndex: 1000,
+      height: '100%',
+      [theme.breakpoints.down('sm')]: {
+        position: 'absolute',
+        transition: 'left 0.5s',
+        maxWidth: (expanded) => expanded ? '350px' : 'auto',
+        height: '100%',
+        left: expanded => expanded ? '0px' : '-350px'
+      }
+    },
+    swipe: {
+      position: 'absolute',
+      height: '100%',
+      width: 40,
+      zIndex: 20
+    }
+  })
+)
+
+export const SideMenu: React.FC = () => {
+  const { expanded, setExpanded } = useSideBarContext();
+  const classes = useStyles();
+
+  const swipeHandler = useSwipeable({
+    onSwipedRight: () => setExpanded(true)
+  })
+
+  const menuHandler = useSwipeable({
+    onSwipedRight: () => setExpanded(true),
+    onSwipedLeft: () => setExpanded(false)
+  })
+
+  return (
+    <>
+      {!expanded && (<div className={classes.swipe} {...swipeHandler} />)}
+      <Paper className={classes.container} {...menuHandler}>
+        <SideMenuHeader
+          onClose={() => setExpanded(false)}
+          onOpen={() => setExpanded(true)}
+          expanded={expanded}
+        />
+        {expanded &&
+          (
+            <>
+              <Divider />
+            </>
+          )
+        }
+      </Paper>
+    </>
+  )
+}
