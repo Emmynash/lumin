@@ -21,7 +21,7 @@ export const ThemeContext = createContext<IThemeContext | undefined>(
 
 let palettePreference = localStorage.getItem('paletteType') as PaletteType;
 if (!palettePreference || !['light', 'dark'].includes(palettePreference)) {
-  palettePreference = 'dark'
+  palettePreference = 'light' 
 }
 
 interface ThemeContextProps {
@@ -32,7 +32,7 @@ export const ProvideThemeContext: React.FC<ThemeContextProps> = ({ children}) =>
   const [paletteType, setPaletteType] = useState<PaletteType>(palettePreference);
   const togglePalette = useCallback(() => {
     setPaletteType((prevType) => {
-      const newType = prevType === 'dark' ? 'light' : 'dark';
+      const newType = prevType === 'light' ? 'dark' : 'light';
       localStorage.setItem('paletteType', newType);
       return newType;
     })
