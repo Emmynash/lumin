@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) =>
       overflowY: 'auto',
       position: 'relative',
       zIndex: 0,
-      padding: theme.spacing(4)
     }
   }))
 interface props extends Partial<JSX.IntrinsicElements['div']> {
