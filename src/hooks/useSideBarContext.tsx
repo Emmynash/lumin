@@ -21,12 +21,7 @@ export const ProvideSideBarContext: React.FC<SideBarContextProps> = ({ children 
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    const expandDefault =
-      isLarge &&
-      !(
-        location.pathname.endsWith('create') ||
-        location.pathname.endsWith('edit')
-      )
+    const expandDefault = isLarge 
     setExpanded(expandDefault);
   }, [isLarge, location.pathname])
 
