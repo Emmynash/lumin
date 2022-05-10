@@ -1,6 +1,6 @@
 import React from 'react';
 import { CssBaseline, createStyles, makeStyles } from "@material-ui/core";
-import { SideMenu } from "components";
+import { Appbar } from "components";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -21,9 +21,9 @@ export const Layout: React.FC<LayoutProps> = ({ children}) => {
   const classes = useStyles();
   return (
     <>
+      <Appbar />
       <CssBaseline />
       <div className={classes.root}>
-        <SideMenu />
         {children}
       </div>
 
