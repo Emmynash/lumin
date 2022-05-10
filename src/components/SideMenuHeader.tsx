@@ -48,27 +48,6 @@ export const SideMenuHeader: React.FC<props> = ({ onClose, onOpen, expanded }) =
 
   return (
     <div className={classes.root}>
-      {!expanded && (
-          <IconButton component={Link} to='/create'>
-            <CreateNoteIcon />
-          </IconButton>
-      )}
-      {expanded && (
-        <div className={classes.header}>
-          <Typography variant="h5">
-            Simple-Pad
-            <small>
-              <em>s</em>
-            </small>
-          </Typography>
-          <Typography variant="subtitle2" color="textSecondary">
-            Offline note taking
-          </Typography>
-        </div>
-      )}
-      <IconButton href="https://github.com/Emmynash/simple-pad">
-        <GithubIcon />
-      </IconButton>
       <IconButton onClick={(() => togglePalette())}>
         {
           paletteType === 'dark' ?
