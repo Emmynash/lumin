@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -10,7 +10,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Drawer from '@mui/material/Drawer';
@@ -23,6 +22,7 @@ const PRODUCTS_QUERY = gql`
     products{
       id
       title
+      price(currency: USD)
       image_url
       product_options {
         title
@@ -37,18 +37,6 @@ const PRODUCTS_QUERY = gql`
 }
 `;
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 declare module '@mui/material/styles' {
   interface Theme {
     status: {
@@ -120,11 +108,7 @@ const cards = [1, 2, 3]
 export const ProductLists: React.FC = () => {
   const { data, loading, error } = useQuery<{ products: Product[] }>(PRODUCTS_QUERY, { errorPolicy: 'all' });
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<{ products: Product[] }>({ products: []});
-
-
-  // if (!loading) { console.log(data?.products.map(data => data.price)); }
-  console.log(cartItems);
+  const [cartItems, setCartItems] = useState<Product[]>([]);
   
   
   const getTotalItems = (items: Product[]) =>
@@ -132,17 +116,17 @@ export const ProductLists: React.FC = () => {
 
   const handleAddToCart = (clickedItem: Product) => {
     setCartItems((prev) => {
-      const isItemInCart = prev.products.find((item) => item.id === clickedItem.id);
+      const isItemInCart = prev.find((item) => item.id === clickedItem.id);
 
       if (isItemInCart) {
-        return prev.products.map((item) =>
+        return prev.map((item) =>
           item.id === clickedItem.id
             ? { ...item, amount: item.amount + 1 }
             : item
         );
       }
 
-      return [...prev.products, { ...clickedItem, amount: 1 }];
+      return [...prev, { ...clickedItem, amount: 1 }];
     });
   };
 
@@ -162,14 +146,16 @@ export const ProductLists: React.FC = () => {
   
  
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Drawer anchor="right" open={cartOpen} onClose={() => setCartOpen(false)}>
         <CartSideMenu
           cartItems={cartItems}
           addToCart={handleAddToCart}
           removeFromCart={handleRemoveFromCart}
+          cartClose={() => setCartOpen(false) }
         />
       </Drawer>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <main
         style={{
@@ -182,6 +168,7 @@ export const ProductLists: React.FC = () => {
             bgcolor: 'background.paper',
             pt: 8,
             pb: 6,
+            display: "flex"
           }}
         >
           <Container maxWidth="lg"> 
@@ -196,13 +183,22 @@ export const ProductLists: React.FC = () => {
               All Products
             </Typography>
             <Toolbar sx={{ flexGrow: 1 }}>
-              <p>A 360 look at lumin</p>
+                <Typography component="h5">A 360 look at lumin</Typography>
                 <Autocomplete
                   id="filter-products"
                   options={cards.sort((a, b) => {return a})}
                   // groupBy={(option) => option.firstLetter}
                   // getOptionLabel={(option) => option.title}
-                sx={{ width: 300, display: "flex", marginLeft: theme.spacing(80) }}
+                  sx={{
+                    width: 300,
+                    display: "flex",
+                    [theme.breakpoints.up("sm")]: {
+                      marginLeft: theme.spacing(2)
+                    },
+                    [theme.breakpoints.up("lg")]: {
+                      marginLeft: theme.spacing(80)
+                    }
+                  }}
                   renderInput={(params) => <TextField {...params} label="Filter by" />}
                  />
             </Toolbar>
@@ -245,7 +241,8 @@ export const ProductLists: React.FC = () => {
                         alignItems: "center",
                         justifyContent: "center",
                         height: "180px",
-                        position: "relative"                      }}
+                        position: "relative"
+                        }}
                     >
                       <CardMedia
                         component="img"
@@ -276,7 +273,7 @@ export const ProductLists: React.FC = () => {
                       {product.title}
                     </Typography>
                     <Typography gutterBottom sx={{ fontSize: '14px', marginTop: "5px", marginBottom: "-10px"  }}>
-                      From $
+                      From $ {product.price}
                     </Typography>
                   </CardContent>
                     <CardActions
@@ -319,9 +316,9 @@ export const ProductLists: React.FC = () => {
         >
           Something here to give the footer a purpose!
         </Typography>
-        <Copyright />
       </Box>
       {/* End footer */}
-    </ThemeProvider>
+      </ThemeProvider>
+    </>
   );
 }
