@@ -23,6 +23,7 @@
     "axios": "^0.27.2",
     "clsx": "^1.1.1",
     "graphql": "^16.4.0",
+    "iso-country-currency": "^0.6.0",
     "moment": "^2.29.3",
     "prettier": "^2.6.2",
     "react": "^18.1.0",
