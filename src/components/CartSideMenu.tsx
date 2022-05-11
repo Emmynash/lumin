@@ -1,83 +1,97 @@
-import React from 'react';
-import { createStyles, makeStyles, Paper, Divider } from "@material-ui/core";
-import { useSideBarContext } from "hooks";
-import { SideMenuHeader, CartItem } from "components";
-import { useSwipeable } from "react-swipeable";
-import { Product } from 'components'
+import React, {useEffect} from 'react';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Paper from '@mui/material/Paper';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
+import { Product, CartItem } from 'components'
+import { useQuery, gql } from "@apollo/client";
+import isocode from "iso-country-currency"
+
+const CURRENCY_QUERY = gql`
+  {
+    currency
+}
+`;
 
 interface Props {
-  cartItems: Product,
+  cartItems: Product[],
   addToCart: (clickedItem: Product) => void,
   removeFromCart: (id: number) => void,
+  cartClose: () => void
 };
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    container: {
-      flex: '0 0 auto',
-      overflowY: 'auto',
-      zIndex: 1000,
-      height: '100%',
-      [theme.breakpoints.down('sm')]: {
-        position: 'absolute',
-        transition: 'left 0.5s',
-        maxWidth: (expanded) => expanded ? '350px' : 'auto',
-        height: '100%',
-        right: expanded => expanded ? '0px' : '-350px'
-      }
-    },
-    swipe: {
-      position: 'absolute',
-      height: '100%',
-      width: 0,
-      zIndex: 0
-    }
-  })
-)
 
-export const CartSideMenu: React.FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
-  const { expanded, setExpanded } = useSideBarContext();
-  const classes = useStyles();
+interface Currency {
+  currency: string[] 
+}
+
+
+export const CartSideMenu: React.FC<Props> = ({ cartItems, addToCart, removeFromCart, cartClose }) => {
+  const { data, loading, error } = useQuery<{currency: Currency[]}>(CURRENCY_QUERY, { errorPolicy: 'all' });
+  const [currency, setCurrency] = React.useState('USD');
+  const [symbol, setSymbol] = React.useState('');
+
+
+  const handleChangeCurrency = (event: SelectChangeEvent) => {
+    setCurrency(event.target.value);
+  };
+
+  useEffect(() => {
+    const getAllIsoCodes = isocode.getAllISOCodes();
+    getAllIsoCodes.map((code) => {
+      if (code.currency === currency) {
+        return setSymbol(code.symbol);
+      }
+    })
+  }, [currency]);
+
 
   const calculateTotal = (items: Product[]) =>
     items.reduce((acc, item) => acc + item.amount * item.price, 0);
 
-  const swipeHandler = useSwipeable({
-    onSwipedRight: () => setExpanded(true)
-  })
-
-  const menuHandler = useSwipeable({
-    onSwipedRight: () => setExpanded(true),
-    onSwipedLeft: () => setExpanded(false)
-  })
-
   return (
     <>
-      {!expanded && (<div className={classes.swipe} {...swipeHandler} />)}
-      <Paper className={classes.container} {...menuHandler}>
-        <SideMenuHeader
-          onClose={() => setExpanded(false)}
-          onOpen={() => setExpanded(true)}
-          expanded={expanded}
-        />
-        {expanded &&
-          (
-            <>
-            <Divider />
+      <Paper>
+        <>
+          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+            <InputLabel id="changeCurrency">Currency</InputLabel>
+            <Select
+              labelId="Change currency"
+              id="changeCurrency"
+              value={currency}
+              onChange={handleChangeCurrency}
+              label="Currency"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {
+                !loading &&
+                !error && 
+                data?.currency.map(currency => (
+                  // @ts-ignore
+                  <MenuItem key={currency} value={currency}>{currency}</MenuItem>
+                ))
+              }
+            </Select>
+          </FormControl>
+          <Divider />
 
-            <h2>Your Cart</h2>
-            {cartItems.length === 0 ? setExpanded(false) : null}
+          <Typography component="h2" variant='h5'>Your Cart</Typography>
+          {cartItems.length === 0 ? cartClose : null}
             {cartItems.map((item) => (
               <CartItem
                 key={item.id}
                 item={item}
                 addToCart={addToCart}
                 removeFromCart={removeFromCart}
+                symbol={symbol}
               />
             ))}
-            <h2>Total: ${calculateTotal(cartItems).toFixed(2)}</h2>
+          <Typography component="h2" variant='h4'>Total: {symbol} {calculateTotal(cartItems).toFixed(2)}</Typography>
             </>
-          )
-        }
       </Paper>
     </>
   )
