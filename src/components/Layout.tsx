@@ -1,6 +1,6 @@
 import React from 'react';
 import { CssBaseline, createStyles, makeStyles } from "@material-ui/core";
-import { Appbar } from "components";
+import { Appbar, CartSideMenu } from "components";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
