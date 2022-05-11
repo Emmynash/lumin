@@ -1,4 +1,3 @@
-export * from "./CreateNoteFAB";
 export * from "./MainPanel";
 export * from "./SideMenuHeader";
 export * from "./CartSideMenu";
