@@ -10,7 +10,7 @@ export const App = () => (
         <ProvideSideBarContext>
           <Layout>
             <Routes>
-            <Route path='/' element={<Products />} />
+              <Route path='/' element={<Products />} />
             </Routes>
           </Layout>
         </ProvideSideBarContext>
